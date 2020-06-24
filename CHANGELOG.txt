@@ -1,0 +1,19 @@
+## [1.2] 02/10/2020
+- Added destination field to allow further user specification
+- Added folders button and second form to allow further user specification
+- Removed all external text files in place of the new config.ini file
+- Added default destination and default folders to config.ini to avoid repitition
+- Added the ability to backup AppData\Roaming folder
+
+## [1.1] 01/31/2020
+- Added graphical user interface
+- Allows the user to select which profiles to backup
+- Logs all uses of the program for troubleshooting
+- Added progress bar
+- Now requires launching as an administrator to avoid backup issues
+
+## [1.0] - 01/21/2020
+- Initial implementation
+- Backs up all profiles excluding the ones listed in user-blacklist.txt
+- Backs up folders listed in folderstobackup.txt
+- Backs up to destination listed in destination.txt
