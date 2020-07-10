@@ -1,3 +1,9 @@
+## [1.3] 07/10/2020
+- Fixed resolution issue where the screen would be cut off on smaller monitors. Size of window is now based on screen height.
+- Refactored copying code to save timestamps on folders and files
+- Added "(DANGER)" tag to AppData to dissuade usage
+
+
 ## [1.2] 02/10/2020
 - Added destination field to allow further user specification
 - Added folders button and second form to allow further user specification
