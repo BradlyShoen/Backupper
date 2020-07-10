@@ -61,7 +61,11 @@ if($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administr
 	    $amountOfWorkToDo = $folders.Length * $userprofiles.Length
 	    $amountOfWorkDone = 0
 
-	    Add-Content $log "Users to backup: $userprofiles`n"
+        Add-Content $log "Users to backup: $userprofiles`n"
+        
+        if(Test-Path ($DestinationTextbox.Text + "\" + $currentDate + " " + $computername)){
+            $computername = $computername + " " + (Get-Date -Format "HHmm")
+        }
 
 	    foreach ($userprofile in $userprofiles){
 		    $counter += 1
@@ -77,7 +81,7 @@ if($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administr
 			        $BackupDestination = $DestinationTextbox.Text + "\" + $currentDate + " " + $computername + "\" + $userprofile.Name + "\" + $f
                 }
 			    Add-Content $log "$BackupSource -> $BackupDestination`n"
-			    Copy-Item -ErrorAction SilentlyContinue -recurse -Path  $BackupSource -Destination $BackupDestination
+                robocopy $BackupSource $BackupDestination "/E" 
 			    Start-Sleep -s 1
 			    $amountOfWorkDone += 1
 			    $ProgressBar.value = ($amountOfWorkDone/$amountOfWorkToDo)*100
@@ -108,8 +112,11 @@ if($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administr
     Add-Type -AssemblyName System.Windows.Forms
     [System.Windows.Forms.Application]::EnableVisualStyles()
 
+    $WindowHeight = [System.Windows.Forms.SystemInformation]::PrimaryMonitorSize.Height - 200
+    $WindowWidth = 600
+
     $Backupper                       = New-Object system.Windows.Forms.Form
-    $Backupper.ClientSize            = '600,800'
+    $Backupper.ClientSize            = ''+$WindowWidth.ToString()+','+$WindowHeight.ToString()
     $Backupper.text                  = "Backupper Version 1.2 By Bradly Shoen"
     $Backupper.TopMost               = $false
     $Backupper.FormBorderStyle = 'Fixed3D'
@@ -138,6 +145,9 @@ if($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administr
         if($folderblacklist -notcontains $allfolders[$i].Name){
             $Checkbox = New-Object System.Windows.Forms.CheckBox
             $Checkbox.Text = $allfolders[$i].name
+            if($Checkbox.Text -eq "AppData"){
+                $Checkbox.Text = $Checkbox.Text + " (DANGER)"
+            }
 	        $Checkbox.Location = New-Object System.Drawing.Size($x,$y)
 	        if($y + 30 -lt $maxY){
 		        $y += 30
@@ -147,7 +157,7 @@ if($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administr
 	        }
 	        $Folders.Controls.Add($Checkbox) 
 	        $Checkbox.Font = 'Microsoft Sans Serif,10'
-	        $Checkbox.width = 120
+	        $Checkbox.width = 180
 	        $Checkbox.height = 20
 	        $Checkbox.AutoSize = $false
 	        $Checkbox | Add-Member NoteProperty "Folder" $allfolders[$i]
@@ -214,7 +224,7 @@ if($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administr
     $Backupper.Controls.Add($UserProfileBox)
 
     $UserCheckboxes = @()
-    $maxY = 680
+    $maxY = ($WindowHeight-120)
     $y = 20
     $x = 10
     for($i = 0; $i -lt $alluserprofiles.Length; $i++){
@@ -238,20 +248,20 @@ if($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administr
 	        $UserCheckboxes += $Checkbox
         }
     }
-    $UserProfileBox.size = New-Object System.Drawing.Size(580,700)
+    $UserProfileBox.size = New-Object System.Drawing.Size(($WindowWidth-20),($WindowHeight-100))
 
     $StartButton                         = New-Object system.Windows.Forms.Button
     $StartButton.text                    = "Start"
     $StartButton.width                   = 60
     $StartButton.height                  = 30
-    $StartButton.location                = New-Object System.Drawing.Point(10,755)
+    $StartButton.location                = New-Object System.Drawing.Point(10,($WindowHeight-45))
     $StartButton.Font                    = 'Microsoft Sans Serif,10'
     $StartButton.Add_Click({ startBackup })
 
     $ProgressBar                    = New-Object system.Windows.Forms.ProgressBar
-    $ProgressBar.width              = 510
+    $ProgressBar.width              = $WindowWidth - 90
     $ProgressBar.height             = 30
-    $ProgressBar.location           = New-Object System.Drawing.Point(80,755)
+    $ProgressBar.location           = New-Object System.Drawing.Point(80,($WindowHeight-45))
 
     $Backupper.controls.AddRange(@($SelectAllButton,$DeselectAllButton,$StartButton,$ProgressBar,$DestinationLabel,$DestinationTextbox,$FoldersButton))
     $Folders.controls.AddRange(@($FoldersLabel))
