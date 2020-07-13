@@ -2,6 +2,8 @@
 - Fixed resolution issue where the screen would be cut off on smaller monitors. Size of window is now based on screen height.
 - Refactored copying code to save timestamps on folders and files
 - Added "(DANGER)" tag to AppData to dissuade usage
+- Added launched user to logs for better accountability
+- Added Restore functionality (will restore backed up profiles to C:\Users)
 
 
 ## [1.2] 02/10/2020
